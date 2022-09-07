@@ -10,9 +10,11 @@ backupLog = open('backup.log', 'a')
 backupLog.write("\n" + datetime.now().strftime('%Y-%m-%d %H:%M:%S ') + "Backup script ran." + "\n")
 
 if not os.path.exists("backupcfg.py"):
-    backupLog.write(datetime.now().strftime('%Y-%m-%d %H:%M:%S ') + "Backup canceled: Couldn't find 'backupcfg.py'. make sure it is in the same folder as 'backup.py'." + "\n")
-    print("Backup canceled: Couldn't find 'backupcfg.py'. make sure it is in the same folder as 'backup.py'.")
-    exit()
+    import urllib.request
+    urllib.request.urlretrieve("https://github.com/30023344/Backup-Script/blob/2c0dc46f8c797a440be62387a9101d32bae302db/backupcfg.py", "backupcfg.py")
+    #backupLog.write(datetime.now().strftime('%Y-%m-%d %H:%M:%S ') + "Backup canceled: Couldn't find 'backupcfg.py'. make sure it is in the same folder as 'backup.py'." + "\n")
+    #print("Backup canceled: Couldn't find 'backupcfg.py'. make sure it is in the same folder as 'backup.py'.")
+    #exit()
 
 from backupcfg import *
 
