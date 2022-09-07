@@ -18,4 +18,4 @@ job4 = ["/home/ec2-user/environment/"]
 jobs = {"job1": job1, "job2": job2, "job3": job3, "h": job4}
 
 # change the folder where backups get saved to by changing the string in quotations.
-backupDir = "/home/ec2-user/environment/BackupScript/backupScript/backup/" # both complete and relative paths work here
+backupDir = "backup" # both complete and relative paths work here
