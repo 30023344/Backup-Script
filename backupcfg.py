@@ -1,5 +1,6 @@
 
 writeToConsole = True
+interactive = False
 
 
 # to add more jobs, just copy one from below and change what is needed.
@@ -16,6 +17,9 @@ job4 = ["/home/ec2-user/environment/"]
 
 # changing the bits in quotes changes what you type after 'backup.py' when you run it in console.
 jobs = {"job1": job1, "job2": job2, "job3": job3, "h": job4}
+# change the folder where backups get saved to by changing the bit after the job name.
+# both complete and relative paths work here.
+directory = {"job1": "backup",  "job2": "backup", "job3": "backup", "h": "backup"}
 
-# change the folder where backups get saved to by changing the string in quotations.
-backupDir = "backup" # both complete and relative paths work here
+
+#backupDir = "backup" # old way of getting directory, now it supports different folders for different jobs
