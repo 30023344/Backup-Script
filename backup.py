@@ -44,9 +44,12 @@ elif not sys.argv[1] in jobs:
     backupComplete = False
 
 else:
-    
+    if sys.platform.startswith("linux"):
+        time = datetime.now().strftime('%Y-%m-%d %H:%M:%S ')
+    else:
+        time = datetime.now().strftime('%Y%m%d %H%M%S ') # systems like windows dont like some characters in file names 
     for n in jobs[sys.argv[1]]:
-        target = backupDir + "/" + datetime.now().strftime('%Y-%m-%d %H:%M:%S ') + pathlib.PurePath(n).name
+        target = backupDir + "/" + time + pathlib.PurePath(n).name
         
         if os.path.exists(backupDir) and os.path.exists(n):
         
