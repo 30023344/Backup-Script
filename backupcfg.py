@@ -13,13 +13,11 @@ job3 = ["new text document.txt"]
 job4 = ["/home/ec2-user/environment/"]
 #job0 = ["<filename>"] - dont forget file extensions!
 
-
+# old way of getting directory, now it supports different folders for different jobs
+backupDir = "backup" # could reference this in 'directory'
 
 # changing the bits in quotes changes what you type after 'backup.py' when you run it in console.
 jobs = {"job1": job1, "job2": job2, "job3": job3, "h": job4}
 # change the folder where backups get saved to by changing the bit after the job name.
 # both complete and relative paths work here.
-directory = {"job1": "backup",  "job2": "backup", "job3": "backup", "h": "backup"}
-
-
-#backupDir = "backup" # old way of getting directory, now it supports different folders for different jobs
+directory = {"job1": backupDir,  "job2": "h", "job3": "backup", "h": "backup"}
