@@ -1,6 +1,9 @@
-# creates a file called 'backup.log'
-backupLog = open('backup.log', 'a')
+#!/usr/bin/env python3
 
+logLoc = "backup.log"
+filesCopied = 0
+foldersCopied = 0
+filesSkipped = 0
 # tries to import libraries. if it fails, it will show a custom error and write to log, then end the script
 try:
     from datetime import datetime
@@ -10,15 +13,18 @@ try:
     import shutil
     import pathlib
 except:
+    backupLog = open('/home/ec2-user/environment/BackupScript 1.3.0/backup.log', 'a')
     try:
-        backupLog.write("\n" + datetime.now().strftime('%Y-%m-%d %H:%M:%S ') + "Backup Canceled: Library import failed." + "\n")
+        backupLog.write("\n" + datetime.now().strftime('%Y-%m-%d %H:%M:%S ') + "Backup Canceled: Library import failed.\n")
     except:
-        backupLog.write("\n" + "TIME_UNKNOWN Backup Canceled: Library import failed." + "\n")
+        backupLog.write("\nTIME_UNKNOWN Backup Canceled: Library import failed.\n")
     print("Backup canceled: Library import failed.")
     exit()
 
-
-backupLog.write("\n" + datetime.now().strftime('%Y-%m-%d %H:%M:%S ') + "Backup script ran." + "\n")
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+# creates a file called 'backup.log'
+backupLog = open(logLoc, 'a')
+backupLog.write("\n" + datetime.now().strftime('%Y-%m-%d %H:%M:%S ') + "Backup script ran.\n")
 
 
 #checks if the config file exists. if it doesn't, it will attempt to retrieve it from github
@@ -49,13 +55,23 @@ def writeToLog(message, write):
 
 # this bit copys files
 def copyFiles():
-    if os.path.isdir(n) == False:
-        shutil.copyfile(n, target)
-        writeToLog(pathlib.PurePath(n).name + " was copied to %s."%(backupDir), True)
-    
-    else:
-        shutil.copytree(n, target)
-        writeToLog(pathlib.PurePath(n).name + " and its contents were copied to %s."%(backupDir), True)
+    try:
+        if os.path.isdir(n) == False:
+            shutil.copyfile(n, target)
+            writeToLog(pathlib.PurePath(n).name + " was copied to %s."%backupDir, True)
+            global filesCopied
+            filesCopied += 1
+        
+        else:
+            shutil.copytree(n, target)
+            writeToLog(pathlib.PurePath(n).name + " and its contents were copied to %s."%backupDir, True)
+            global foldersCopied
+            foldersCopied += 1
+    except:
+        writeToLog(pathlib.PurePath(n).name + " Error: '%s' could not be backed up with unknown reason."%n, False)
+        print("Error: '%s' could not be backed up with unknown reason."%n)
+        global filesSkipped
+        filesSkipped += 1
 
 
 
@@ -70,6 +86,10 @@ if len(sys.argv) < 2:
         writeToLog("Backup canceled: No argument given.", False)
         exit()
 
+if len(job) > 2 and acceptMultibleArgs == False:
+    job = ["backup.py", job[1]]
+
+
 if sys.platform.startswith("linux"):
     time = datetime.now().strftime('%Y-%m-%d %H:%M:%S ')
 else:
@@ -83,15 +103,16 @@ if True:
         if not job in jobs:
             if interactive == True:
                 while not job in jobs:
-                    print("Error: '%s' does not exist."%(job))
+                    print("Error: '%s' does not exist."%job)
                     job = input("Enter name of job: ")
             
             else:
-                print("Error: '%s' does not exist."%(job))
+                print("Error: '%s' does not exist."%job)
                 writeToLog("Job skipped: Argument given did not match job in 'backupcfg.py'.", False)
                 continue # goes to next job
-        
-        writeToLog("backing up files defined in '%s'"%(job), True)
+        if writeToConsole == True:
+            print("")
+        writeToLog("backing up files defined in '%s'"%job, True)
         backupDir = directory[job]
         
         # calls the 'copyFiles()' function multible times for each file in the job
@@ -105,16 +126,16 @@ if True:
             elif os.path.exists(n):
                 
                 os.mkdir(backupDir)
-                writeToLog("'%s' was created."%(backupDir), True)
+                writeToLog("'%s' was created."%backupDir, True)
                 copyFiles()
             
             else:
-            
-                writeToLog("File skipped: '%s' does not exist."%(n), True)
-                fileSkipped = True
-        if writeToConsole == False and fileSkipped == True:
-            print("Some files in %s were skipped. Read log for more information."%job)
+                
+                writeToLog("File skipped: '%s' does not exist."%n, True)
+                filesSkipped += 1
+        
 
 
 writeToLog("Finished backup.", False)
-print("Backup complete!")
+print("\nBackup complete!\nSummary:\n%s files copied\n%s folders copied\n%s files skipped"%(filesCopied, foldersCopied, filesSkipped))
+sys.exit(0)
