@@ -4,6 +4,8 @@ logLoc = "backup.log"
 filesCopied = 0
 foldersCopied = 0
 filesSkipped = 0
+jobsCompleted = 0
+jobsSkipped = 0
 # tries to import libraries. if it fails, it will show a custom error and write to log, then end the script
 try:
     from datetime import datetime
@@ -13,7 +15,12 @@ try:
     import shutil
     import pathlib
 except:
-    backupLog = open('/home/ec2-user/environment/BackupScript 1.3.0/backup.log', 'a')
+    try:
+        import os
+        os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    except:
+        pass
+    backupLog = open(logLoc, 'a')
     try:
         backupLog.write("\n" + datetime.now().strftime('%Y-%m-%d %H:%M:%S ') + "Backup Canceled: Library import failed.\n")
     except:
@@ -30,15 +37,15 @@ backupLog.write("\n" + datetime.now().strftime('%Y-%m-%d %H:%M:%S ') + "Backup s
 #checks if the config file exists. if it doesn't, it will attempt to retrieve it from github
 
 if not os.path.exists("backupcfg.py"):
-    cfgUrl = "https://raw.githubusercontent.com/30023344/Backup-Script/8f964dfeddf6128b5fa482f8031e925d59e19f38/backupcfg.py?token=GHSAT0AAAAAABYMOCIT7AWR27WYPWFC7EIYYYYCPBA" # doesnt work, link is not permanent 
+    cfgUrl = "https://raw.githubusercontent.com/30023344/Backup-Script/d55509ceb6656491c48592b0df6ece17aff9d1f5/backupcfg.py" # doesnt work, link is not permanent 
     try:
         import urllib.request
         urllib.request.urlretrieve(cfgUrl, "backupcfg.py")
-        backupLog.write(datetime.now().strftime('%Y-%m-%d %H:%M:%S ') + "'backupcfg.py' was created. Retrieved from '%s'."%(cfgUrl) + "\n")
+        backupLog.write(datetime.now().strftime('%Y-%m-%d %H:%M:%S ') + "'backupcfg.py' was created. Retrieved from '%s'.\n"%cfgUrl)
         print("'backupcfg.py' was created.")
     except:
-        backupLog.write(datetime.now().strftime('%Y-%m-%d %H:%M:%S ') + "Backup Canceled: couldn't retrieve 'backupcfg.py' from '%s'."%(cfgUrl) + "\n")
-        print("Backup canceled: Couldn't retrieve 'backupcfg.py' from '%s'."%(cfgUrl))
+        backupLog.write(datetime.now().strftime('%Y-%m-%d %H:%M:%S ') + "Backup Canceled: couldn't retrieve 'backupcfg.py' from '%s'.\n"%cfgUrl)
+        print("Backup canceled: Couldn't retrieve 'backupcfg.py' from '%s'."%cfgUrl)
         exit()
 
 from backupcfg import *
@@ -68,8 +75,7 @@ def copyFiles():
             global foldersCopied
             foldersCopied += 1
     except:
-        writeToLog(pathlib.PurePath(n).name + " Error: '%s' could not be backed up with unknown reason."%n, False)
-        print("Error: '%s' could not be backed up with unknown reason."%n)
+        writeToLog(pathlib.PurePath(n).name + " Error: '%s' could not be backed up with unknown reason."%n, True)
         global filesSkipped
         filesSkipped += 1
 
@@ -109,6 +115,7 @@ if True:
             else:
                 print("Error: '%s' does not exist."%job)
                 writeToLog("Job skipped: Argument given did not match job in 'backupcfg.py'.", False)
+                jobsSkipped += 1
                 continue # goes to next job
         if writeToConsole == True:
             print("")
@@ -133,9 +140,9 @@ if True:
                 
                 writeToLog("File skipped: '%s' does not exist."%n, True)
                 filesSkipped += 1
-        
+        jobsCompleted += 1
 
 
 writeToLog("Finished backup.", False)
-print("\nBackup complete!\nSummary:\n%s files copied\n%s folders copied\n%s files skipped"%(filesCopied, foldersCopied, filesSkipped))
+print("\nBackup complete!\nSummary:\n%s files copied\n%s folders copied\n%s files skipped\n%s jobs completed\n%s jobs skipped"%(filesCopied, foldersCopied, filesSkipped, jobsCompleted, jobsSkipped))
 sys.exit(0)
