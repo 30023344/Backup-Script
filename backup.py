@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 
+"""
+
+ ~~  Backup Script by Henry Davis  ~~
+copyright: all rights reserved.
+
+Ver: 1.4.0 - dev version
+
+"""
+
 logLoc = "backup.log"
 filesCopied = 0
 foldersCopied = 0
@@ -34,7 +43,7 @@ backupLog = open(logLoc, 'a')
 backupLog.write("\n" + datetime.now().strftime('%Y-%m-%d %H:%M:%S ') + "Backup script ran.\n")
 
 
-#checks if the config file exists. if it doesn't, it will attempt to retrieve it from github
+# checks if the config file exists. if it doesn't, it will attempt to retrieve it from github
 
 if not os.path.exists("backupcfg.py"):
     cfgUrl = "https://raw.githubusercontent.com/30023344/Backup-Script/d55509ceb6656491c48592b0df6ece17aff9d1f5/backupcfg.py" # doesnt work, link is not permanent 
@@ -124,6 +133,11 @@ if True:
         
         # calls the 'copyFiles()' function multible times for each file in the job
         for n in jobs[job]:
+            if not os.path.exists(backupDir):
+                writeToLog("File skipped: backup directory '%s' does not exist."%backupDir, True)
+                filesSkipped += 1
+                continue
+            
             target = backupDir + "/" + time + pathlib.PurePath(n).name
             
             if os.path.exists(backupDir) and os.path.exists(n):
