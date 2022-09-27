@@ -133,10 +133,6 @@ if True:
         
         # calls the 'copyFiles()' function multible times for each file in the job
         for n in jobs[job]:
-            if not os.path.exists(backupDir):
-                writeToLog("File skipped: backup directory '%s' does not exist."%backupDir, True)
-                filesSkipped += 1
-                continue
             
             target = backupDir + "/" + time + pathlib.PurePath(n).name
             
@@ -146,7 +142,7 @@ if True:
             
             elif os.path.exists(n):
                 
-                os.mkdir(backupDir)
+                os.makedirs(backupDir)
                 writeToLog("'%s' was created."%backupDir, True)
                 copyFiles()
             
