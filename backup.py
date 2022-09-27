@@ -5,7 +5,7 @@
  ~~  Backup Script by Henry Davis  ~~
 copyright: all rights reserved.
 
-Ver: 1.4.0 - dev version
+Ver: 1.4.3
 
 """
 
